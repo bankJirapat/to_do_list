@@ -1,25 +1,25 @@
 const fs = require('fs');
 let dataString
 let msg = '';
-const main_todo = async (command,value) => {
-    console.log("command : ",command," value: " , value);
-    if(command == "addTodo"){
+const main_todo = async (command, value) => {
+    console.log("command : ", command, " value: ", value);
+    if (command == "addTodo") {
         await addDataToFileJSON(value)
         // console.log("msg : ",msg)
-    }else if(command == "deleteTodo"){
+    } else if (command == "deleteTodo") {
         let TodoDelete = await deleteDataToFileJSON(value)
         msg = TodoDelete ? `${value} was deleted in to do list` : `${value} not found in to do list`
         // console.log("msg : ",msg)
-    }else if(command == "readTodo"){
+    } else if (command == "readTodo") {
         let todo = await readDataFileJSON(value)
         msg = todo ? `Great! ${value} was found in to do list` : `Sorry! ${value} not found in to do list`
-    }else if(command == "listAllTodo"){
+    } else if (command == "listAllTodo") {
         let list = await listAllDataFileJSON()
         msg = await listItem(list)
-    }else {
+    } else {
         msg = "Invalid command"
     }
-   
+
     return msg;
 }
 
@@ -31,33 +31,33 @@ const addDataToFileJSON = async (value) => {
         value
     };
 
-    try{
+    try {
 
-        if(arrTodo.length > 0){
+        if (arrTodo.length > 0) {
             // console.log("----- todo-data is not null -----")
             let duplicatetodo = arrTodo.filter((objTodo) => objTodo.value == value)
             // console.log("duplicationtodo : ", duplicatetodo)
-            if(duplicatetodo.length == 0){
+            if (duplicatetodo.length == 0) {
                 arrTodo.push(objTodo);
                 // console.log("arrTodo : ",arrTodo)
                 await saveDataInFile(arrTodo)
                 msg = `add (${value}) is finished `;
-            }else{
+            } else {
                 msg = `(${value}) is already listed`
             }
 
-        }else{
+        } else {
 
             // console.log("----- todo-data is null -----")
             arrTodo.push(objTodo);
             await saveDataInFile(arrTodo)
             msg = `add (${value}) is finished `;
-        } 
+        }
         return msg
 
-    }catch (e){
+    } catch (e) {
         msg = e.message
-        console.log("error : " , msg)
+        console.log("error : ", msg)
         return msg
     }
 
@@ -67,45 +67,50 @@ const addDataToFileJSON = async (value) => {
 const deleteDataToFileJSON = async (value) => {
 
     dataString = await fetchData()
-    if(dataString.length > 0){
+    if (dataString.length > 0) {
         let filterData = dataString.filter((dataString) => dataString.value != value)
         await saveDataInFile(filterData)
 
         return dataString.length != filterData.length
-    }else {
+    } else {
         // console.log("===== No data in file =====")
         return false
     }
-    
+
 }
 
 // read a todo item in list
 const readDataFileJSON = async (value) => {
 
     dataString = await fetchData()
-    if(dataString.length > 0){
+    if (dataString.length > 0) {
         let filteredTodos = dataString.filter((dataString) => dataString.value == value);
-        console.log("filteredTodos : ",filteredTodos)
+        console.log("filteredTodos : ", filteredTodos)
         return filteredTodos[0];
-    }else {
+    } else {
         return false
     }
 }
 
 // list all a todo item
 const listAllDataFileJSON = async () => {
-    return await fetchData()
+    let arr = await fetchData()
+    console.log("listAllDataFileJSON : ", arr)
+    let filteredArr = arr.filter(obj => obj.value)
+
+    console.log("array : ", filteredArr)
+    return filteredArr
 }
 
 const fetchData = async () => {
     let data = fs.readFileSync('todo-data.json')
-    console.log("data fetchData : ",data)
-    if(data.length > 0){
+    console.log("data fetchData : ", data)
+    if (data.length > 0) {
         return JSON.parse(data)
-    }else{
+    } else {
         return []
     }
-    
+
 }
 
 const saveDataInFile = async (data) => {
@@ -115,7 +120,7 @@ const saveDataInFile = async (data) => {
 const listItem = async (obj) => {
     let msg = `- TodoList : ${obj.length} List -\r\n`
     let m = ""
-    for(let i = 0; i < obj.length; i++){
+    for (let i = 0; i < obj.length; i++) {
         let a = obj[i].value
         m += `+ ${a}\r\n`
     }
